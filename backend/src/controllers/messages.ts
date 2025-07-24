@@ -4,7 +4,7 @@ import { AppError } from '../lib/errors';
 import { sendMessageSchema, threadListSchema } from '../lib/validation';
 
 // Create or get thread for an enquiry
-export const createOrGetThread = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const createOrGetThread = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const { enquiryId } = req.params;
     const userId = req.user!.id;

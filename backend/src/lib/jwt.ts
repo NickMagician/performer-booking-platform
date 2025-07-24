@@ -16,9 +16,9 @@ export interface JwtTokens {
  * Generate JWT access token
  */
 export const generateAccessToken = (payload: JwtPayload): string => {
-  return jwt.sign(payload, config.jwtSecret as string, {
+  return jwt.sign(payload, config.jwtSecret, {
     expiresIn: config.jwtExpiresIn,
-  });
+  }) as string;
 };
 
 /**
