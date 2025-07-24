@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ["nodejs_18", "yarn"]
-
-[phases.build]
-cmd = "npm install && npm run build"
-
-[phases.start]
-cmd = "npm start"
