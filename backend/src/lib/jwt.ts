@@ -20,7 +20,7 @@ export const generateAccessToken = (payload: JwtPayload): string => {
     expiresIn: config.jwtExpiresIn,
     issuer: 'booking-platform',
     audience: 'booking-platform-users',
-  });
+  } as jwt.SignOptions);
 };
 
 /**

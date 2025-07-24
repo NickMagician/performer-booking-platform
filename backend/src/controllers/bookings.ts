@@ -12,7 +12,7 @@ export const confirmBooking = async (req: Request, res: Response, next: NextFunc
     const userId = req.user!.id;
 
     // Verify performer user type
-    if (req.user!.user_type !== 'PERFORMER') {
+    if (req.user!.userType !== 'PERFORMER') {
       throw new AppError('Only performers can confirm bookings', 403);
     }
 
@@ -200,7 +200,7 @@ export const listBookings = async (req: Request, res: Response, next: NextFuncti
   try {
     const validatedQuery = bookingListSchema.parse(req.query);
     const userId = req.user!.id;
-    const userType = req.user!.user_type;
+    const userType = req.user!.userType;
 
     let whereClause: any = {};
 
@@ -401,7 +401,7 @@ export const getBooking = async (req: Request, res: Response, next: NextFunction
     // Check authorization - only client who booked or performer assigned can view
     const isClient = booking.client_id === userId;
     const isPerformer = booking.performer.user_id === userId;
-    const isAdmin = req.user!.user_type === 'ADMIN';
+    const isAdmin = req.user!.userType === 'ADMIN';
 
     if (!isClient && !isPerformer && !isAdmin) {
       throw new AppError('Not authorized to view this booking', 403);

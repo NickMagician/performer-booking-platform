@@ -18,21 +18,21 @@ const router = Router();
  * @desc    Create Stripe Connect onboarding link for performers
  * @access  Private (Performer only)
  */
-router.get('/onboard', jwtAuth, createOnboardingLink);
+router.get('/onboard', jwtAuth, createOnboardingLink as any);
 
 /**
  * @route   GET /api/payments/account-status
  * @desc    Get Stripe Connect account status for performer
  * @access  Private (Performer only)
  */
-router.get('/account-status', jwtAuth, getAccountStatus);
+router.get('/account-status', jwtAuth, getAccountStatus as any);
 
 /**
  * @route   GET /api/payments/onboard-return
  * @desc    Handle return from Stripe Connect onboarding
  * @access  Private (Performer only)
  */
-router.get('/onboard-return', jwtAuth, handleOnboardingReturn);
+router.get('/onboard-return', jwtAuth, handleOnboardingReturn as any);
 
 /**
  * @route   GET /api/payments/payouts

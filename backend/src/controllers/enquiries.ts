@@ -14,7 +14,7 @@ export const createEnquiry = async (req: Request, res: Response, next: NextFunct
     const clientId = req.user!.id;
 
     // Verify client user type
-    if (req.user!.user_type !== 'CLIENT') {
+    if (req.user!.userType !== 'CLIENT') {
       throw new AppError('Only clients can create enquiries', 403);
     }
 
@@ -159,7 +159,7 @@ export const getEnquiry = async (req: Request, res: Response, next: NextFunction
     // Check authorization - only client who created or performer assigned can view
     const isClient = enquiry.client_id === userId;
     const isPerformer = enquiry.performer.user_id === userId;
-    const isAdmin = req.user!.user_type === 'ADMIN';
+    const isAdmin = req.user!.userType === 'ADMIN';
 
     if (!isClient && !isPerformer && !isAdmin) {
       throw new AppError('Not authorized to view this enquiry', 403);
@@ -207,7 +207,7 @@ export const listEnquiries = async (req: Request, res: Response, next: NextFunct
   try {
     const validatedQuery = enquiryListSchema.parse(req.query);
     const userId = req.user!.id;
-    const userType = req.user!.user_type;
+    const userType = req.user!.userType;
 
     let whereClause: any = {};
 
@@ -323,7 +323,7 @@ export const updateEnquiryStatus = async (req: Request, res: Response, next: Nex
     const userId = req.user!.id;
 
     // Verify performer user type
-    if (req.user!.user_type !== 'PERFORMER') {
+    if (req.user!.userType !== 'PERFORMER') {
       throw new AppError('Only performers can update enquiry status', 403);
     }
 

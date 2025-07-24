@@ -12,7 +12,7 @@ export const cancelBooking = async (req: Request, res: Response, next: NextFunct
     const userId = req.user!.id;
 
     // Verify client user type
-    if (req.user!.user_type !== 'CLIENT') {
+    if (req.user!.userType !== 'CLIENT') {
       throw new AppError('Only clients can cancel bookings', 403);
     }
 

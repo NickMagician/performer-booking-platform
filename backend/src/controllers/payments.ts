@@ -7,7 +7,7 @@ import { AuthenticatedRequest } from '../middleware/auth';
  * Create Stripe Connect onboarding link for performers
  * POST /api/payments/onboard
  */
-export const createOnboardingLink = async (req: AuthenticatedRequest, res: Response) => {
+export const createOnboardingLink = async (req: AuthenticatedRequest, res: Response): Promise<Response | void> => {
   try {
     const userId = req.user?.id;
     
@@ -87,7 +87,7 @@ export const createOnboardingLink = async (req: AuthenticatedRequest, res: Respo
  * Get Stripe Connect account status for performer
  * GET /api/payments/account-status
  */
-export const getAccountStatus = async (req: AuthenticatedRequest, res: Response) => {
+export const getAccountStatus = async (req: AuthenticatedRequest, res: Response): Promise<Response | void> => {
   try {
     const userId = req.user?.id;
     
@@ -159,7 +159,7 @@ export const getAccountStatus = async (req: AuthenticatedRequest, res: Response)
  * Handle return from Stripe Connect onboarding
  * GET /api/payments/onboard-return
  */
-export const handleOnboardingReturn = async (req: AuthenticatedRequest, res: Response) => {
+export const handleOnboardingReturn = async (req: AuthenticatedRequest, res: Response): Promise<Response | void> => {
   try {
     const userId = req.user?.id;
     
@@ -216,7 +216,7 @@ export const handleOnboardingReturn = async (req: AuthenticatedRequest, res: Res
  * Get payout history for performer or admin
  * GET /api/payments/payouts
  */
-export const getPayouts = async (req: Request, res: Response) => {
+export const getPayouts = async (req: Request, res: Response): Promise<Response | void> => {
   try {
     const userId = req.user?.id;
     const userType = req.user?.userType;
@@ -331,7 +331,7 @@ export const getPayouts = async (req: Request, res: Response) => {
  * Trigger manual payout for a specific booking (Admin only)
  * POST /api/payments/manual-payout/:bookingId
  */
-export const triggerManualPayout = async (req: Request, res: Response) => {
+export const triggerManualPayout = async (req: Request, res: Response): Promise<Response | void> => {
   try {
     const { bookingId } = req.params;
     const userId = req.user?.id;

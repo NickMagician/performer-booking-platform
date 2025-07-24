@@ -65,7 +65,7 @@ export async function seedReviewsAndTestimonials() {
         status: 'ACTIVE',
       }
     });
-    createdClients.push(client);
+    createdClients.push(client as any);
   }
 
   const allClients = [...clients, ...createdClients];

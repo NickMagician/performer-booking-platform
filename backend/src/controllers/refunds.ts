@@ -22,7 +22,7 @@ const manualRefundSchema = z.object({
  * Get all refunds with filtering (Admin only)
  * GET /api/refunds
  */
-export const getRefunds = async (req: Request, res: Response) => {
+export const getRefunds = async (req: Request, res: Response): Promise<Response | void> => {
   try {
     const { status, performer_id, date_from, date_to, page = 1, limit = 20 } = getRefundsSchema.parse(req.query);
 
@@ -151,7 +151,7 @@ export const getRefunds = async (req: Request, res: Response) => {
  * Process manual refund for a booking (Admin only)
  * POST /api/refunds/:bookingId/manual
  */
-export const processManualRefund = async (req: Request, res: Response) => {
+export const processManualRefund = async (req: Request, res: Response): Promise<Response | void> => {
   try {
     const { bookingId } = req.params;
     const { reason } = manualRefundSchema.parse(req.body);

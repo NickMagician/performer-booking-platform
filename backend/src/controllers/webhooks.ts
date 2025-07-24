@@ -7,7 +7,7 @@ import { config } from '../config';
  * Handle Stripe webhook events
  * POST /api/webhooks/stripe
  */
-export const handleStripeWebhook = async (req: Request, res: Response) => {
+export const handleStripeWebhook = async (req: Request, res: Response): Promise<Response | void> => {
   const sig = req.headers['stripe-signature'] as string;
   const endpointSecret = config.stripeWebhookSecret;
 

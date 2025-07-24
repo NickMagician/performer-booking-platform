@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
-import { Prisma, PrismaClientKnownRequestError } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { config } from '../config';
 
 export interface ApiError extends Error {
@@ -45,7 +45,7 @@ const handleZodError = (error: ZodError): AppError => {
 /**
  * Handle Prisma errors
  */
-const handlePrismaError = (error: PrismaClientKnownRequestError): AppError => {
+const handlePrismaError = (error: Prisma.PrismaClientKnownRequestError): AppError => {
   switch (error.code) {
     case 'P2002':
       // Unique constraint violation
@@ -78,7 +78,7 @@ const handlePrismaError = (error: PrismaClientKnownRequestError): AppError => {
  * Global error handling middleware
  */
 export const errorHandler = (
-  error: Error | ApiError | ZodError | PrismaClientKnownRequestError,
+  error: Error | ApiError | ZodError | Prisma.PrismaClientKnownRequestError,
   req: Request,
   res: Response,
   next: NextFunction
@@ -88,7 +88,7 @@ export const errorHandler = (
   // Handle different types of errors
   if (error instanceof ZodError) {
     appError = handleZodError(error);
-  } else if (error instanceof PrismaClientKnownRequestError) {
+  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
     appError = handlePrismaError(error);
   } else if (error instanceof AppError) {
     appError = error;
