@@ -10,7 +10,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
     }
 
     // Check if user is admin
-    if (req.user.user_type !== 'ADMIN') {
+    if (req.user?.userType !== 'ADMIN') {
       throw new AppError('Admin access required', 403);
     }
 

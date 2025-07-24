@@ -219,7 +219,7 @@ export const handleOnboardingReturn = async (req: AuthenticatedRequest, res: Res
 export const getPayouts = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const userType = req.user?.user_type;
+    const userType = req.user?.userType;
 
     if (!userId || !userType) {
       return res.status(401).json({
@@ -335,7 +335,7 @@ export const triggerManualPayout = async (req: Request, res: Response) => {
   try {
     const { bookingId } = req.params;
     const userId = req.user?.id;
-    const userType = req.user?.user_type;
+    const userType = req.user?.userType;
 
     // Admin only endpoint
     if (userType !== 'ADMIN') {

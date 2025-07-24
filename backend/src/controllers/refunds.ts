@@ -131,7 +131,7 @@ export const getRefunds = async (req: Request, res: Response) => {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Invalid query parameters',
@@ -287,10 +287,10 @@ export const processManualRefund = async (req: Request, res: Response) => {
       throw new AppError(`Manual refund failed: ${stripeError.message}`, 500);
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
-        error: 'Invalid request data',
+        error: 'Invalid request body',
         details: error.errors
       });
     }

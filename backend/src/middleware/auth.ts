@@ -17,6 +17,17 @@ declare global {
   }
 }
 
+// Export the AuthenticatedRequest type
+export interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    email: string;
+    userType: 'CLIENT' | 'PERFORMER' | 'ADMIN';
+    firstName: string;
+    lastName: string;
+  };
+}
+
 /**
  * Middleware to authenticate JWT tokens
  */
@@ -185,3 +196,7 @@ export const optionalAuthenticate = async (
     next();
   }
 };
+
+// Export aliases for backward compatibility
+export const authenticateToken = authenticate;
+export const jwtAuth = authenticate;

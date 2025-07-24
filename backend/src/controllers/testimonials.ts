@@ -10,7 +10,7 @@ export const createTestimonial = async (req: Request, res: Response, next: NextF
     const userId = req.user!.id;
 
     // Check if user is admin
-    if (req.user!.user_type !== 'ADMIN') {
+    if (req.user?.userType !== 'ADMIN') {
       throw new AppError('Only admins can create testimonials', 403);
     }
 
@@ -198,7 +198,7 @@ export const toggleFeaturedTestimonial = async (req: Request, res: Response, nex
     const userId = req.user!.id;
 
     // Check if user is admin
-    if (req.user!.user_type !== 'ADMIN') {
+    if (req.user?.userType !== 'ADMIN') {
       throw new AppError('Only admins can toggle featured testimonials', 403);
     }
 
