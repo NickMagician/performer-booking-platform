@@ -76,7 +76,7 @@ export const createOnboardingLink = async (req: AuthenticatedRequest, res: Respo
 
   } catch (error) {
     console.error('Error creating onboarding link:', error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       error: 'Failed to create onboarding link',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -148,7 +148,7 @@ export const getAccountStatus = async (req: AuthenticatedRequest, res: Response)
 
   } catch (error) {
     console.error('Error getting account status:', error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       error: 'Failed to get account status',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -319,7 +319,7 @@ export const getPayouts = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error('Error retrieving payouts:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to retrieve payouts',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -427,7 +427,7 @@ export const triggerManualPayout = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error('Error processing manual payout:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to process manual payout',
       details: error instanceof Error ? error.message : 'Unknown error'

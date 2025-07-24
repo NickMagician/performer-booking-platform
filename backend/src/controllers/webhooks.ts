@@ -67,7 +67,7 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error(`❌ Error processing webhook event ${event.type}:`, error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       error: 'Webhook processing failed',
       event_type: event.type,
       details: error instanceof Error ? error.message : 'Unknown error'

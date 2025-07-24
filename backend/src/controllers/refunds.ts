@@ -140,7 +140,7 @@ export const getRefunds = async (req: Request, res: Response) => {
     }
 
     console.error('❌ Error fetching refunds:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to fetch refunds',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -302,7 +302,7 @@ export const processManualRefund = async (req: Request, res: Response) => {
     }
 
     console.error('❌ Error processing manual refund:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to process manual refund',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
