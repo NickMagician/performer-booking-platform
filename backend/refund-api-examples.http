@@ -1,0 +1,108 @@
+### Refund Management API Examples
+### Admin-only endpoints for refund oversight and manual intervention
+
+@baseUrl = http://localhost:3001
+@adminToken = your_admin_jwt_token_here
+
+###
+# 1. Get All Refunds (Admin Only)
+# Returns all bookings with refund activity, with filtering options
+GET {{baseUrl}}/api/refunds
+Authorization: Bearer {{adminToken}}
+
+###
+# 2. Get Refunds with Status Filter
+GET {{baseUrl}}/api/refunds?status=FAILED
+Authorization: Bearer {{adminToken}}
+
+###
+# 3. Get Refunds by Performer
+GET {{baseUrl}}/api/refunds?performer_id=performer_id_here
+Authorization: Bearer {{adminToken}}
+
+###
+# 4. Get Refunds with Date Range
+GET {{baseUrl}}/api/refunds?date_from=2024-01-01T00:00:00.000Z&date_to=2024-12-31T23:59:59.999Z
+Authorization: Bearer {{adminToken}}
+
+###
+# 5. Get Refunds with Pagination
+GET {{baseUrl}}/api/refunds?page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+# 6. Get Refunds with Multiple Filters
+GET {{baseUrl}}/api/refunds?status=PENDING&performer_id=performer_id_here&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+###
+# 7. Process Manual Refund (Admin Only)
+# Only works for bookings with FAILED or PENDING refund status
+POST {{baseUrl}}/api/refunds/booking_id_here/manual
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "reason": "Customer complaint resolved - processing manual refund as original automatic refund failed due to technical issue"
+}
+
+###
+# Example Response for Get Refunds:
+# {
+#   "refunds": [
+#     {
+#       "booking_id": "clx123abc",
+#       "client_name": "John Smith",
+#       "client_email": "john@example.com",
+#       "performer_name": "Amazing Magic Shows",
+#       "performer_email": "performer@example.com",
+#       "event_date": "2024-06-15T14:00:00.000Z",
+#       "event_location": "London, UK",
+#       "booking_amount": "500.00",
+#       "deposit_amount": "125.00",
+#       "refund_amount": "375.00",
+#       "refund_status": "REFUNDED",
+#       "stripe_refund_id": "re_1234567890",
+#       "cancellation_reason": "Event cancelled by client",
+#       "refund_reason": "Refund of £375 processed (deposit non-refundable)",
+#       "cancelled_at": "2024-06-10T10:30:00.000Z",
+#       "cancelled_by": "CLIENT",
+#       "refund_processed_at": "2024-06-10T10:35:00.000Z"
+#     }
+#   ],
+#   "pagination": {
+#     "page": 1,
+#     "limit": 20,
+#     "total": 15,
+#     "pages": 1
+#   }
+# }
+
+###
+# Example Response for Manual Refund:
+# {
+#   "message": "Manual refund processed successfully",
+#   "refund": {
+#     "booking_id": "clx123abc",
+#     "refund_amount": 375.00,
+#     "stripe_refund_id": "re_1234567890",
+#     "transaction_id": "cly456def",
+#     "status": "REFUNDED",
+#     "reason": "Customer complaint resolved - processing manual refund as original automatic refund failed due to technical issue",
+#     "processed_at": "2024-06-10T15:45:00.000Z"
+#   }
+# }
+
+###
+# Webhook Events Handled:
+# - charge.refunded: Updates booking and transaction status when Stripe processes refund
+# - charge.refund.updated: Tracks failed or pending refunds for manual intervention
+
+###
+# Admin Use Cases:
+# 1. Monitor all refund activity across the platform
+# 2. Filter refunds by status to find failed refunds needing attention
+# 3. Filter by performer to investigate specific performer issues
+# 4. Process manual refunds when automatic refunds fail
+# 5. Track refund processing times and success rates
+# 6. Generate refund reports for financial reconciliation

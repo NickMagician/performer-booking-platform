@@ -1,0 +1,373 @@
+{
+  "title": "Multi-Vendor Performer Booking Platform Schema",
+  "description": "Data model for a booking marketplace similar to Poptop.uk.com",
+  "version": "1.0.0",
+  "entities": {
+    "User": {
+      "description": "Central user management for clients, performers, and admins",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "email": { "type": "string", "max_length": 255, "unique": true, "required": true },
+        "password_hash": { "type": "string", "max_length": 255, "required": true },
+        "first_name": { "type": "string", "max_length": 100, "required": true },
+        "last_name": { "type": "string", "max_length": 100, "required": true },
+        "phone": { "type": "string", "max_length": 20 },
+        "user_type": { "type": "enum", "values": ["client", "performer", "admin"], "required": true },
+        "is_verified": { "type": "boolean", "default": false },
+        "is_active": { "type": "boolean", "default": true },
+        "profile_image_url": { "type": "string", "max_length": 500 },
+        "created_at": { "type": "datetime", "default": "now" },
+        "updated_at": { "type": "datetime", "default": "now", "auto_update": true },
+        "last_login": { "type": "datetime" }
+      },
+      "indexes": ["email", "user_type"]
+    },
+    
+    "Category": {
+      "description": "Performance categories/act types",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "name": { "type": "string", "max_length": 100, "unique": true, "required": true },
+        "slug": { "type": "string", "max_length": 100, "unique": true, "required": true },
+        "description": { "type": "text" },
+        "icon_url": { "type": "string", "max_length": 500 },
+        "is_active": { "type": "boolean", "default": true },
+        "sort_order": { "type": "integer", "default": 0 },
+        "created_at": { "type": "datetime", "default": "now" },
+        "updated_at": { "type": "datetime", "default": "now", "auto_update": true }
+      }
+    },
+    
+    "Performer": {
+      "description": "Detailed performer profiles",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "user_id": { "type": "integer", "foreign_key": "User.id", "required": true, "cascade_delete": true },
+        "stage_name": { "type": "string", "max_length": 150 },
+        "bio": { "type": "text" },
+        "years_experience": { "type": "integer" },
+        "base_price": { "type": "decimal", "precision": 10, "scale": 2 },
+        "price_currency": { "type": "string", "max_length": 3, "default": "GBP" },
+        "price_type": { "type": "enum", "values": ["per_hour", "per_event", "per_person", "custom"], "default": "per_event" },
+        "travel_radius": { "type": "integer", "description": "Miles willing to travel" },
+        
+        "address_line1": { "type": "string", "max_length": 255 },
+        "address_line2": { "type": "string", "max_length": 255 },
+        "city": { "type": "string", "max_length": 100 },
+        "county": { "type": "string", "max_length": 100 },
+        "postcode": { "type": "string", "max_length": 20 },
+        "country": { "type": "string", "max_length": 100, "default": "United Kingdom" },
+        "latitude": { "type": "decimal", "precision": 10, "scale": 8 },
+        "longitude": { "type": "decimal", "precision": 11, "scale": 8 },
+        
+        "min_performance_duration": { "type": "integer", "description": "Minutes" },
+        "max_performance_duration": { "type": "integer", "description": "Minutes" },
+        "setup_time_required": { "type": "integer", "description": "Minutes" },
+        "equipment_provided": { "type": "text" },
+        "space_requirements": { "type": "text" },
+        
+        "is_professional": { "type": "boolean", "default": false },
+        "insurance_coverage": { "type": "boolean", "default": false },
+        "dbs_checked": { "type": "boolean", "default": false },
+        
+        "total_bookings": { "type": "integer", "default": 0 },
+        "average_rating": { "type": "decimal", "precision": 3, "scale": 2, "default": 0.00 },
+        "total_reviews": { "type": "integer", "default": 0 },
+        "response_rate": { "type": "decimal", "precision": 5, "scale": 2, "default": 0.00 },
+        "response_time_hours": { "type": "integer", "default": 24 },
+        
+        "is_featured": { "type": "boolean", "default": false },
+        "is_verified": { "type": "boolean", "default": false },
+        "is_active": { "type": "boolean", "default": true },
+        "profile_completion_percentage": { "type": "integer", "default": 0 },
+        
+        "created_at": { "type": "datetime", "default": "now" },
+        "updated_at": { "type": "datetime", "default": "now", "auto_update": true }
+      },
+      "indexes": ["user_id", "city", "county", "postcode", "average_rating", "base_price", "is_active", "is_featured"],
+      "relationships": {
+        "user": { "type": "belongs_to", "entity": "User" },
+        "categories": { "type": "many_to_many", "entity": "Category", "through": "PerformerCategory" },
+        "media": { "type": "has_many", "entity": "PerformerMedia" },
+        "availability": { "type": "has_many", "entity": "PerformerAvailability" },
+        "blackout_dates": { "type": "has_many", "entity": "PerformerBlackoutDate" },
+        "testimonials": { "type": "has_many", "entity": "Testimonial" },
+        "enquiries": { "type": "has_many", "entity": "Enquiry" },
+        "reviews": { "type": "has_many", "entity": "Review" }
+      }
+    },
+    
+    "PerformerCategory": {
+      "description": "Junction table for performer-category relationships",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true, "cascade_delete": true },
+        "category_id": { "type": "integer", "foreign_key": "Category.id", "required": true, "cascade_delete": true },
+        "is_primary": { "type": "boolean", "default": false },
+        "created_at": { "type": "datetime", "default": "now" }
+      },
+      "unique_constraints": [["performer_id", "category_id"]],
+      "indexes": ["performer_id", "category_id"]
+    },
+    
+    "PerformerMedia": {
+      "description": "Media gallery for performers",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true, "cascade_delete": true },
+        "media_type": { "type": "enum", "values": ["image", "video", "audio"], "required": true },
+        "file_url": { "type": "string", "max_length": 500, "required": true },
+        "thumbnail_url": { "type": "string", "max_length": 500 },
+        "title": { "type": "string", "max_length": 200 },
+        "description": { "type": "text" },
+        "is_featured": { "type": "boolean", "default": false },
+        "sort_order": { "type": "integer", "default": 0 },
+        "file_size": { "type": "integer", "description": "Bytes" },
+        "duration": { "type": "integer", "description": "Seconds for video/audio" },
+        "created_at": { "type": "datetime", "default": "now" }
+      },
+      "indexes": ["performer_id", "is_featured"]
+    },
+    
+    "PerformerAvailability": {
+      "description": "Weekly availability schedule",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true, "cascade_delete": true },
+        "day_of_week": { "type": "integer", "required": true, "description": "0=Sunday, 1=Monday, etc." },
+        "start_time": { "type": "time", "required": true },
+        "end_time": { "type": "time", "required": true },
+        "is_available": { "type": "boolean", "default": true },
+        "created_at": { "type": "datetime", "default": "now" }
+      },
+      "unique_constraints": [["performer_id", "day_of_week", "start_time", "end_time"]]
+    },
+    
+    "PerformerBlackoutDate": {
+      "description": "Unavailable dates for performers",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true, "cascade_delete": true },
+        "start_date": { "type": "date", "required": true },
+        "end_date": { "type": "date", "required": true },
+        "reason": { "type": "string", "max_length": 255 },
+        "is_recurring": { "type": "boolean", "default": false },
+        "created_at": { "type": "datetime", "default": "now" }
+      }
+    },
+    
+    "Enquiry": {
+      "description": "Booking requests from clients to performers",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "client_id": { "type": "integer", "foreign_key": "User.id", "required": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true },
+        
+        "event_type": { "type": "string", "max_length": 100 },
+        "event_date": { "type": "date", "required": true },
+        "event_start_time": { "type": "time" },
+        "event_duration": { "type": "integer", "description": "Minutes" },
+        "guest_count": { "type": "integer" },
+        
+        "venue_name": { "type": "string", "max_length": 200 },
+        "venue_address": { "type": "text" },
+        "venue_city": { "type": "string", "max_length": 100 },
+        "venue_postcode": { "type": "string", "max_length": 20 },
+        
+        "message": { "type": "text", "required": true },
+        "budget_min": { "type": "decimal", "precision": 10, "scale": 2 },
+        "budget_max": { "type": "decimal", "precision": 10, "scale": 2 },
+        "special_requirements": { "type": "text" },
+        
+        "status": { "type": "enum", "values": ["pending", "responded", "accepted", "declined", "cancelled", "completed"], "default": "pending" },
+        "performer_response": { "type": "text" },
+        "quoted_price": { "type": "decimal", "precision": 10, "scale": 2 },
+        
+        "created_at": { "type": "datetime", "default": "now" },
+        "responded_at": { "type": "datetime" },
+        "updated_at": { "type": "datetime", "default": "now", "auto_update": true }
+      },
+      "indexes": ["client_id", "performer_id", "status", "event_date"],
+      "relationships": {
+        "client": { "type": "belongs_to", "entity": "User" },
+        "performer": { "type": "belongs_to", "entity": "Performer" },
+        "review": { "type": "has_one", "entity": "Review" }
+      }
+    },
+    
+    "Review": {
+      "description": "Client reviews and ratings for performers",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "enquiry_id": { "type": "integer", "foreign_key": "Enquiry.id", "required": true, "unique": true },
+        "client_id": { "type": "integer", "foreign_key": "User.id", "required": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true },
+        
+        "rating": { "type": "integer", "required": true, "min": 1, "max": 5 },
+        "title": { "type": "string", "max_length": 200 },
+        "review_text": { "type": "text", "required": true },
+        "event_type": { "type": "string", "max_length": 100 },
+        "event_date": { "type": "date" },
+        
+        "professionalism_rating": { "type": "integer", "min": 1, "max": 5 },
+        "quality_rating": { "type": "integer", "min": 1, "max": 5 },
+        "value_rating": { "type": "integer", "min": 1, "max": 5 },
+        "communication_rating": { "type": "integer", "min": 1, "max": 5 },
+        
+        "is_verified": { "type": "boolean", "default": false },
+        "is_featured": { "type": "boolean", "default": false },
+        "is_visible": { "type": "boolean", "default": true },
+        
+        "performer_response": { "type": "text" },
+        "performer_responded_at": { "type": "datetime" },
+        
+        "created_at": { "type": "datetime", "default": "now" },
+        "updated_at": { "type": "datetime", "default": "now", "auto_update": true }
+      },
+      "indexes": ["performer_id", "rating", "is_visible"],
+      "relationships": {
+        "enquiry": { "type": "belongs_to", "entity": "Enquiry" },
+        "client": { "type": "belongs_to", "entity": "User" },
+        "performer": { "type": "belongs_to", "entity": "Performer" },
+        "votes": { "type": "has_many", "entity": "ReviewVote" }
+      }
+    },
+    
+    "ReviewVote": {
+      "description": "Helpfulness votes for reviews",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "review_id": { "type": "integer", "foreign_key": "Review.id", "required": true, "cascade_delete": true },
+        "user_id": { "type": "integer", "foreign_key": "User.id", "required": true },
+        "is_helpful": { "type": "boolean", "required": true },
+        "created_at": { "type": "datetime", "default": "now" }
+      },
+      "unique_constraints": [["review_id", "user_id"]]
+    },
+    
+    "Testimonial": {
+      "description": "Curated testimonials for performers",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true, "cascade_delete": true },
+        "client_name": { "type": "string", "max_length": 200, "required": true },
+        "client_title": { "type": "string", "max_length": 200 },
+        "testimonial_text": { "type": "text", "required": true },
+        "event_type": { "type": "string", "max_length": 100 },
+        "is_featured": { "type": "boolean", "default": false },
+        "is_verified": { "type": "boolean", "default": false },
+        "sort_order": { "type": "integer", "default": 0 },
+        "created_at": { "type": "datetime", "default": "now" }
+      }
+    },
+    
+    "SavedPerformer": {
+      "description": "Client wishlist/saved performers",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "client_id": { "type": "integer", "foreign_key": "User.id", "required": true },
+        "performer_id": { "type": "integer", "foreign_key": "Performer.id", "required": true },
+        "created_at": { "type": "datetime", "default": "now" }
+      },
+      "unique_constraints": [["client_id", "performer_id"]]
+    },
+    
+    "SearchHistory": {
+      "description": "Search analytics and history",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "user_id": { "type": "integer", "foreign_key": "User.id", "nullable": true },
+        "session_id": { "type": "string", "max_length": 100 },
+        "search_query": { "type": "string", "max_length": 500 },
+        "category_id": { "type": "integer", "foreign_key": "Category.id", "nullable": true },
+        "location": { "type": "string", "max_length": 200 },
+        "price_min": { "type": "decimal", "precision": 10, "scale": 2 },
+        "price_max": { "type": "decimal", "precision": 10, "scale": 2 },
+        "results_count": { "type": "integer" },
+        "created_at": { "type": "datetime", "default": "now" }
+      }
+    },
+    
+    "AdminAction": {
+      "description": "Audit trail for admin actions",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "admin_id": { "type": "integer", "foreign_key": "User.id", "required": true },
+        "action_type": { "type": "enum", "values": ["approve_performer", "suspend_performer", "delete_review", "feature_performer", "moderate_content"], "required": true },
+        "target_type": { "type": "enum", "values": ["performer", "review", "enquiry", "user"], "required": true },
+        "target_id": { "type": "integer", "required": true },
+        "reason": { "type": "text" },
+        "notes": { "type": "text" },
+        "created_at": { "type": "datetime", "default": "now" }
+      }
+    },
+    
+    "PlatformSetting": {
+      "description": "Configurable platform settings",
+      "fields": {
+        "id": { "type": "integer", "primary_key": true, "auto_increment": true },
+        "setting_key": { "type": "string", "max_length": 100, "unique": true, "required": true },
+        "setting_value": { "type": "text" },
+        "setting_type": { "type": "enum", "values": ["string", "integer", "boolean", "json"], "default": "string" },
+        "description": { "type": "text" },
+        "is_public": { "type": "boolean", "default": false },
+        "updated_by": { "type": "integer", "foreign_key": "User.id", "nullable": true },
+        "updated_at": { "type": "datetime", "default": "now", "auto_update": true }
+      }
+    }
+  },
+  
+  "search_filters": {
+    "description": "Supported search and filter options",
+    "filters": {
+      "act_type": {
+        "field": "Category.slug",
+        "type": "select",
+        "source": "categories table"
+      },
+      "location": {
+        "fields": ["Performer.city", "Performer.county", "Performer.postcode"],
+        "type": "text_search",
+        "supports_radius": true
+      },
+      "price_range": {
+        "field": "Performer.base_price",
+        "type": "range",
+        "currency": "GBP"
+      },
+      "rating": {
+        "field": "Performer.average_rating",
+        "type": "range",
+        "min": 1,
+        "max": 5
+      },
+      "availability": {
+        "tables": ["PerformerAvailability", "PerformerBlackoutDate"],
+        "type": "date_check"
+      },
+      "verified_only": {
+        "field": "Performer.is_verified",
+        "type": "boolean"
+      },
+      "featured_only": {
+        "field": "Performer.is_featured",
+        "type": "boolean"
+      }
+    }
+  },
+  
+  "api_endpoints": {
+    "description": "Suggested REST API structure",
+    "endpoints": {
+      "GET /api/performers": "List performers with filters",
+      "GET /api/performers/{id}": "Get performer details",
+      "GET /api/categories": "List all categories",
+      "POST /api/enquiries": "Create new enquiry",
+      "GET /api/enquiries": "List user's enquiries",
+      "POST /api/reviews": "Create review",
+      "GET /api/reviews": "List reviews for performer",
+      "POST /api/performers/{id}/save": "Save performer to wishlist",
+      "GET /api/search": "Search performers with filters"
+    }
+  }
+}

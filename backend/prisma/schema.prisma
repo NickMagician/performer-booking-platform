@@ -1,0 +1,443 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Types Enum
+enum UserType {
+  CLIENT
+  PERFORMER
+  ADMIN
+}
+
+// User Status Enum
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+// Enquiry Status Enum
+enum EnquiryStatus {
+  PENDING
+  RESPONDED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+// Booking Status Enum
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+// Transaction Type Enum
+enum TransactionType {
+  DEPOSIT
+  FINAL_PAYMENT
+  REFUND
+  PLATFORM_FEE
+  PAYOUT
+}
+
+// Transaction Status Enum
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  SUCCEEDED
+  REFUNDED
+}
+
+// Cancellation Source Enum
+enum CancelledBy {
+  CLIENT
+  PERFORMER
+  ADMIN
+}
+
+// Refund Status Enum
+enum RefundStatus {
+  NONE
+  PENDING
+  REFUNDED
+  FAILED
+}
+
+// Event Type Enum for Reviews and Testimonials
+enum EventType {
+  WEDDING
+  BIRTHDAY
+  CORPORATE
+  OTHER
+}
+
+// Users table - Core user authentication and profile
+model User {
+  id                    String     @id @default(cuid())
+  email                 String     @unique
+  password_hash         String
+  first_name            String
+  last_name             String
+  phone                 String?
+  user_type             UserType   @default(CLIENT)
+  status                UserStatus @default(PENDING_VERIFICATION)
+  profile_image_url     String?
+  email_verified        Boolean    @default(false)
+  email_verification_token String?
+  password_reset_token  String?
+  password_reset_expires DateTime?
+  last_login            DateTime?
+  created_at            DateTime   @default(now())
+  updated_at            DateTime   @updatedAt
+
+  // Relationships
+  performer             Performer?
+  client_enquiries      Enquiry[]  @relation("ClientEnquiries")
+  client_reviews        Review[]   @relation("ClientReviews")
+  client_bookings       Booking[]  @relation("ClientBookings")
+  sent_messages         Message[]  @relation("SentMessages")
+  submitted_testimonials Testimonial[] @relation("SubmittedTestimonials")
+
+  @@map("users")
+}
+
+// Performers table - Extended profile for performers
+model Performer {
+  id                    String    @id @default(cuid())
+  user_id               String    @unique
+  business_name         String?
+  bio                   String?
+  location              String
+  postcode              String?
+  latitude              Decimal?  @db.Decimal(10, 8)
+  longitude             Decimal?  @db.Decimal(11, 8)
+  travel_distance       Int?      // Max travel distance in miles
+  base_price            Decimal   @db.Decimal(10, 2)
+  price_per_hour        Decimal?  @db.Decimal(10, 2)
+  minimum_booking_hours Int?      @default(1)
+  setup_time_minutes    Int?      @default(30)
+  website_url           String?
+  facebook_url          String?
+  instagram_url         String?
+  youtube_url           String?
+  is_featured           Boolean   @default(false)
+  is_verified           Boolean   @default(false)
+  average_rating        Decimal?  @db.Decimal(3, 2)
+  total_reviews         Int       @default(0)
+  total_bookings        Int       @default(0)
+  response_rate         Decimal?  @db.Decimal(5, 2)
+  response_time_hours   Int?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  // Stripe Connect fields
+  stripe_account_id     String?
+  stripe_onboarding_complete Boolean @default(false)
+  payout_enabled        Boolean   @default(false)
+
+  // Relationships
+  user                  User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  categories            PerformerCategory[]
+  media                 Media[]
+  testimonials          Testimonial[]
+  availability          Availability[]
+  enquiries             Enquiry[]
+  reviews               Review[]
+  bookings              Booking[] @relation("PerformerBookings")
+  pricing               PerformerPricing[]
+
+  @@map("performers")
+}
+
+// Categories table
+model Category {
+  id                    String    @id @default(cuid())
+  name                  String    @unique
+  slug                  String    @unique
+  description           String?
+  icon_url              String?
+  is_active             Boolean   @default(true)
+  sort_order            Int       @default(0)
+  performer_count       Int       @default(0)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  // Relationships
+  performers            PerformerCategory[]
+
+  @@map("categories")
+}
+
+// Junction table for performer categories (many-to-many)
+model PerformerCategory {
+  id            String    @id @default(cuid())
+  performer_id  String
+  category_id   String
+  is_primary    Boolean   @default(false)
+  created_at    DateTime  @default(now())
+
+  // Relationships
+  performer     Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+  category      Category  @relation(fields: [category_id], references: [id], onDelete: Cascade)
+
+  @@unique([performer_id, category_id])
+  @@map("performer_categories")
+}
+
+// Media table for performer photos/videos
+model Media {
+  id            String    @id @default(cuid())
+  performer_id  String
+  file_url      String
+  file_type     String    // 'image' or 'video'
+  title         String?
+  description   String?
+  sort_order    Int       @default(0)
+  is_featured   Boolean   @default(false)
+  created_at    DateTime  @default(now())
+
+  // Relationships
+  performer     Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+
+  @@map("media")
+}
+
+// Testimonials table
+model Testimonial {
+  id                   String    @id @default(cuid())
+  performer_id         String
+  author_name          String    // Name of person giving testimonial
+  quote                String    // Testimonial content (max 2000 chars enforced in validation)
+  event_type           EventType
+  submitted_by_user_id String?   // Optional FK to User who submitted (for admin tracking)
+  is_featured          Boolean   @default(false)
+  created_at           DateTime  @default(now())
+
+  // Relationships
+  performer            Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+  submitted_by         User?     @relation("SubmittedTestimonials", fields: [submitted_by_user_id], references: [id], onDelete: SetNull)
+
+  @@map("testimonials")
+}
+
+// Availability table
+model Availability {
+  id            String    @id @default(cuid())
+  performer_id  String
+  date          DateTime  @db.Date
+  is_available  Boolean   @default(true)
+  notes         String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  // Relationships
+  performer     Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+
+  @@unique([performer_id, date])
+  @@map("availability")
+}
+
+// Enquiries table
+model Enquiry {
+  id                String    @id @default(cuid())
+  client_id         String
+  performer_id      String
+  event_date        DateTime
+  event_time        String?
+  event_duration    Int?      // Duration in hours
+  event_type        String
+  event_location    String
+  guest_count       Int?
+  budget_min        Decimal?  @db.Decimal(10, 2)
+  budget_max        Decimal?  @db.Decimal(10, 2)
+  special_requests  String?   // renamed from message
+  message           String    // general message/description
+  status            EnquiryStatus @default(PENDING)
+  performer_response String?
+  quoted_price      Decimal?  @db.Decimal(10, 2)
+  response_date     DateTime?
+  expires_at        DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relationships
+  client            User      @relation("ClientEnquiries", fields: [client_id], references: [id], onDelete: Cascade)
+  performer         Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+  booking           Booking?
+  message_thread    MessageThread?
+
+  @@map("enquiries")
+}
+
+// Bookings table
+model Booking {
+  id                String    @id @default(cuid())
+  enquiry_id        String    @unique
+  client_id         String
+  performer_id      String
+  event_date        DateTime
+  event_time        String
+  event_duration    Int       // Duration in hours
+  event_location    String
+  guest_count       Int?
+  confirmed_price   Decimal   @db.Decimal(10, 2)  // renamed from total_amount
+  deposit_amount    Decimal   @db.Decimal(10, 2)  // 25% deposit by default
+  deposit_paid      Boolean   @default(false)
+  platform_fee      Decimal   @db.Decimal(10, 2)
+  performer_amount  Decimal   @db.Decimal(10, 2)
+  status            BookingStatus @default(CONFIRMED)
+  payment_status    String    @default("pending") // pending, paid, refunded, failed
+  payout_status     String    @default("pending") // pending, paid, failed
+  payout_at         DateTime?
+  cancellation_reason String?
+  cancelled_at      DateTime?
+  cancelled_by      CancelledBy?
+  refund_status     RefundStatus @default(NONE)
+  refund_reason     String?
+  completed_at      DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Stripe fields
+  stripe_payment_intent_id String?
+  stripe_transfer_id       String?
+
+  // Relationships
+  enquiry           Enquiry   @relation(fields: [enquiry_id], references: [id], onDelete: Cascade)
+  client            User      @relation("ClientBookings", fields: [client_id], references: [id], onDelete: Cascade)
+  performer         Performer @relation("PerformerBookings", fields: [performer_id], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+  review            Review?
+  message_thread    MessageThread?
+
+  @@map("bookings")
+}
+
+// Reviews table
+model Review {
+  id                   String    @id @default(cuid())
+  booking_id           String    @unique
+  client_id            String
+  performer_id         String
+  rating_overall       Int       @db.SmallInt // 1-5 rating
+  rating_quality       Int       @db.SmallInt // 1-5 rating
+  rating_communication Int       @db.SmallInt // 1-5 rating
+  written_review       String    // Max 2000 chars (enforced in validation)
+  is_verified          Boolean   @default(true)
+  event_type           EventType
+  photos               String[]  // Array of photo URLs
+  created_at           DateTime  @default(now())
+
+  // Relationships
+  booking              Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  client               User      @relation("ClientReviews", fields: [client_id], references: [id], onDelete: Cascade)
+  performer            Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+// Message Threads table for organizing conversations
+model MessageThread {
+  id              String    @id @default(cuid())
+  enquiry_id      String    @unique
+  booking_id      String?   @unique
+  participant_ids String[]  // Array of user IDs who can access this thread
+  is_archived     Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  // Relationships
+  enquiry         Enquiry   @relation(fields: [enquiry_id], references: [id], onDelete: Cascade)
+  booking         Booking?  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  messages        Message[]
+
+  @@map("message_threads")
+}
+
+// Messages table for thread-based communication
+model Message {
+  id            String        @id @default(cuid())
+  thread_id     String
+  sender_id     String
+  content       String
+  file_url      String?       // Optional file attachment URL
+  is_read       Boolean       @default(false)
+  sent_at       DateTime      @default(now())
+
+  // Relationships
+  thread        MessageThread @relation(fields: [thread_id], references: [id], onDelete: Cascade)
+  sender        User          @relation("SentMessages", fields: [sender_id], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+// Transactions table for payment tracking
+model Transaction {
+  id                String    @id @default(cuid())
+  booking_id        String
+  type              TransactionType
+  amount            Decimal   @db.Decimal(10, 2)
+  currency          String    @default("GBP")
+  status            TransactionStatus @default(PENDING)
+  stripe_payment_intent_id String?
+  stripe_transfer_id String?
+  stripe_refund_id  String?
+  description       String?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relationships
+  booking           Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+// Performer pricing table for different event types/durations
+model PerformerPricing {
+  id            String    @id @default(cuid())
+  performer_id  String
+  event_type    String    // wedding, corporate, party, etc.
+  duration_hours Int
+  price         Decimal   @db.Decimal(10, 2)
+  description   String?
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  // Relationships
+  performer     Performer @relation(fields: [performer_id], references: [id], onDelete: Cascade)
+
+  @@unique([performer_id, event_type, duration_hours])
+  @@map("performer_pricing")
+}
+
+// Indexes for performance
+@@index([User.email])
+@@index([User.user_type])
+@@index([User.status])
+@@index([Performer.location])
+@@index([Performer.is_featured])
+@@index([Performer.is_verified])
+@@index([Performer.average_rating])
+@@index([Category.slug])
+@@index([Category.is_active])
+@@index([Enquiry.status])
+@@index([Enquiry.event_date])
+@@index([Booking.status])
+@@index([Booking.event_date])
+@@index([Review.overall_rating])
+@@index([Availability.date])
+@@index([Availability.is_available])

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magicians in Manchester - Find & Book Local Magic Performers | BookPerformers</title>
+    <meta name="description" content="Find and book professional magicians in Manchester. 47 verified performers available. Compare prices, read reviews, and get instant quotes for your event.">
+    <link rel="canonical" href="https://bookperformers.com/magicians/manchester">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        .filter-tag { animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .performer-card:hover { transform: translateY(-2px); transition: transform 0.2s ease; }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="text-2xl font-bold text-blue-600">BookPerformers</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="/search" class="text-gray-700 hover:text-blue-600">Browse Performers</a>
+                    <a href="/categories" class="text-gray-700 hover:text-blue-600">Categories</a>
+                    <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="bg-white border-b shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Search for performers, e.g. 'wedding magician in Manchester'"
+                            value="magician manchester"
+                            class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <button class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
+                    Search
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Magicians in Manchester</h1>
+            <p class="text-gray-600 text-lg">47 professional magicians available for hire in Manchester and surrounding areas</p>
+        </div>
+
+        <!-- Active Filter Tags -->
+        <div class="mb-6">
+            <div class="flex flex-wrap gap-2">
+                <span class="filter-tag bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                    🎩 Magicians
+                    <button class="hover:bg-blue-200 rounded-full p-1">×</button>
+                </span>
+                <span class="filter-tag bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                    📍 Manchester
+                    <button class="hover:bg-green-200 rounded-full p-1">×</button>
+                </span>
+                <button class="text-gray-500 hover:text-gray-700 text-sm underline">Clear all filters</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Desktop Filters Sidebar -->
+            <div class="hidden lg:block">
+                <div class="sticky top-24 bg-white rounded-lg shadow-lg p-6 space-y-6">
+                    
+                    <!-- Sort Options -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sort by</label>
+                        <select class="w-full p-3 border border-gray-300 rounded-lg">
+                            <option>Best Match</option>
+                            <option>Highest Rated</option>
+                            <option>Price: Low to High</option>
+                            <option>Distance</option>
+                        </select>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Location</h3>
+                        <input 
+                            type="text" 
+                            placeholder="City, postcode, or area"
+                            value="Manchester"
+                            class="w-full p-3 border border-gray-300 rounded-lg mb-3"
+                        >
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-2">Travel radius: 25 miles</label>
+                            <input type="range" min="5" max="100" value="25" class="w-full">
+                        </div>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Price Range</h3>
+                        <div class="flex items-center gap-2 mb-3">
+                            <input type="number" placeholder="Min" value="200" class="w-full p-2 border rounded">
+                            <span>-</span>
+                            <input type="number" placeholder="Max" value="800" class="w-full p-2 border rounded">
+                        </div>
+                        <input type="range" min="0" max="2000" value="500" class="w-full">
+                    </div>
+
+                    <!-- Rating Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Minimum Rating</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="rating" value="4.0" checked class="text-blue-600">
+                                <span class="ml-2 text-sm">⭐⭐⭐⭐ 4.0+ (31)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="rating" value="3.5" class="text-blue-600">
+                                <span class="ml-2 text-sm">⭐⭐⭐ 3.5+ (42)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Features Filter -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Features</h3>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-sm">✓ Verified Performers</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-sm">🛡️ Fully Insured</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Filter Button -->
+            <div class="lg:hidden mb-4">
+                <button class="flex items-center justify-between w-full p-4 bg-white rounded-lg shadow border">
+                    <span class="flex items-center gap-2">
+                        Filters
+                        <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">2</span>
+                    </span>
+                    <span>→</span>
+                </button>
+            </div>
+
+            <!-- Results Column -->
+            <div class="lg:col-span-3">
+                
+                <!-- Results Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-gray-600">Showing 1-12 of 47 results</p>
+                </div>
+
+                <!-- Performer Results Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+                    
+                    <!-- Performer Card 1 - Ben Williams -->
+                    <div class="performer-card bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop" 
+                                 alt="Ben Williams - Close-Up Magician" 
+                                 class="w-full h-48 object-cover">
+                            <div class="absolute top-3 left-3">
+                                <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">⭐ Featured</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900">Ben Williams</h3>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-yellow-400">⭐</span>
+                                    <span class="text-sm font-medium">4.9</span>
+                                    <span class="text-sm text-gray-500">(47)</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Close-Up Magician</p>
+                            <p class="text-sm text-gray-500 mb-3">📍 Manchester • 2.3 miles away</p>
+                            <p class="text-sm text-gray-700 mb-4">Specializing in mind-bending close-up magic that happens right in your guests' hands.</p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-lg font-bold text-green-600">From £350</span>
+                                    <span class="text-sm text-gray-500">/event</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-2 border border-blue-600 text-blue-600 text-sm rounded hover:bg-blue-50">
+                                        Quick Enquiry
+                                    </button>
+                                    <a href="/performer/ben-williams" class="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performer Card 2 - Sarah Thompson -->
+                    <div class="performer-card bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=250&fit=crop" 
+                                 alt="Sarah Thompson - Stage Magician" 
+                                 class="w-full h-48 object-cover">
+                            <div class="absolute top-3 left-3">
+                                <span class="bg-green-600 text-white text-xs px-2 py-1 rounded-full">✓ Verified</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900">Sarah Thompson</h3>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-yellow-400">⭐</span>
+                                    <span class="text-sm font-medium">4.8</span>
+                                    <span class="text-sm text-gray-500">(32)</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Stage Magician & Illusionist</p>
+                            <p class="text-sm text-gray-500 mb-3">📍 Salford • 4.1 miles away</p>
+                            <p class="text-sm text-gray-700 mb-4">Award-winning stage performer with grand illusions and audience participation.</p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-lg font-bold text-green-600">From £450</span>
+                                    <span class="text-sm text-gray-500">/event</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-2 border border-blue-600 text-blue-600 text-sm rounded hover:bg-blue-50">
+                                        Quick Enquiry
+                                    </button>
+                                    <a href="/performer/sarah-thompson" class="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performer Card 3 - Michael Chen -->
+                    <div class="performer-card bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=250&fit=crop" 
+                                 alt="Michael Chen - Children's Magician" 
+                                 class="w-full h-48 object-cover">
+                            <div class="absolute top-3 left-3">
+                                <span class="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">🎪 Kids Specialist</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-lg font-semibold text-gray-900">Michael Chen</h3>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-yellow-400">⭐</span>
+                                    <span class="text-sm font-medium">4.9</span>
+                                    <span class="text-sm text-gray-500">(58)</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Children's Magician</p>
+                            <p class="text-sm text-gray-500 mb-3">📍 Stockport • 6.8 miles away</p>
+                            <p class="text-sm text-gray-700 mb-4">Interactive magic shows designed specifically for children. DBS checked.</p>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-lg font-bold text-green-600">From £280</span>
+                                    <span class="text-sm text-gray-500">/event</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-2 border border-blue-600 text-blue-600 text-sm rounded hover:bg-blue-50">
+                                        Quick Enquiry
+                                    </button>
+                                    <a href="/performer/michael-chen" class="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center items-center space-x-4">
+                    <button disabled class="px-4 py-2 text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                        Previous
+                    </button>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-2 bg-blue-600 text-white rounded">1</button>
+                        <button class="px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">2</button>
+                        <button class="px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">3</button>
+                        <button class="px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">4</button>
+                    </div>
+                    <button class="px-4 py-2 text-blue-600 bg-white border border-blue-600 rounded-lg hover:bg-blue-50">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Results Fallback (Hidden) -->
+        <div id="noResults" class="hidden text-center py-12">
+            <div class="max-w-md mx-auto">
+                <div class="text-6xl mb-4">🔍</div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">No performers found</h2>
+                <p class="text-gray-600 mb-6">Try adjusting your filters or search in a nearby area.</p>
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <a href="/magicians/liverpool" class="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200">Liverpool</a>
+                    <a href="/magicians/leeds" class="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200">Leeds</a>
+                    <a href="/caricaturists/manchester" class="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200">Caricaturists</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Search functionality
+        function updateSearch() {
+            // Update URL and trigger search
+            console.log('Search updated');
+        }
+        
+        function removeFilter(filterType) {
+            // Remove specific filter
+            console.log('Filter removed:', filterType);
+        }
+        
+        function clearAllFilters() {
+            // Clear all active filters
+            console.log('All filters cleared');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,765 @@
+# Booking Platform API Examples
+# Use with REST Client extension in VS Code or similar HTTP client
+
+### Variables
+@baseUrl = http://localhost:3001/api
+@contentType = application/json
+
+### Health Check
+GET http://localhost:3001/health
+
+### API Info
+GET {{baseUrl}}
+
+### User Signup (Client)
+POST {{baseUrl}}/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "email": "john.client@example.com",
+  "password": "ClientPassword123!",
+  "firstName": "John",
+  "lastName": "Client",
+  "phone": "+44 7700 900123",
+  "userType": "CLIENT"
+}
+
+### User Signup (Performer)
+POST {{baseUrl}}/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "email": "jane.performer@example.com",
+  "password": "PerformerPassword123!",
+  "firstName": "Jane",
+  "lastName": "Performer",
+  "phone": "+44 7700 900456",
+  "userType": "PERFORMER"
+}
+
+### User Login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "john.client@example.com",
+  "password": "ClientPassword123!"
+}
+
+### Get Current User Profile (requires auth token)
+GET {{baseUrl}}/users/me
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Refresh Token (requires auth token)
+POST {{baseUrl}}/auth/refresh
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Logout (requires auth token)
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Example Error Cases
+
+# Invalid email format
+POST {{baseUrl}}/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid-email",
+  "password": "ValidPassword123!",
+  "firstName": "Test",
+  "lastName": "User",
+  "userType": "CLIENT"
+}
+
+# Weak password
+POST {{baseUrl}}/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com",
+  "password": "123",
+  "firstName": "Test",
+  "lastName": "User",
+  "userType": "CLIENT"
+}
+
+# Invalid login credentials
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "nonexistent@example.com",
+  "password": "WrongPassword123!"
+}
+
+# Missing authorization header
+GET {{baseUrl}}/users/me
+
+### ========================================
+### PERFORMER ENDPOINTS
+### ========================================
+
+### Get all performers (with search/filter)
+GET {{baseUrl}}/performers
+
+### Get performers with filters
+GET {{baseUrl}}/performers?category=magicians&location=london&minPrice=100&maxPrice=500&minRating=4&sortBy=rating&sortOrder=desc&page=1&limit=10
+
+### Get specific performer by ID
+GET {{baseUrl}}/performers/PERFORMER_ID_HERE
+
+### Create performer profile (requires PERFORMER auth)
+POST {{baseUrl}}/performers
+Authorization: Bearer YOUR_PERFORMER_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "businessName": "Amazing Magic Shows",
+  "bio": "Professional magician with 15 years of experience entertaining audiences of all ages. Specializing in close-up magic, stage illusions, and interactive shows perfect for weddings, corporate events, and private parties.",
+  "location": "London",
+  "postcode": "SW1A 1AA",
+  "latitude": 51.5074,
+  "longitude": -0.1278,
+  "travelDistance": 50,
+  "basePrice": 350.00,
+  "pricePerHour": 200.00,
+  "minimumBookingHours": 2,
+  "setupTimeMinutes": 30,
+  "websiteUrl": "https://amazingmagicshows.co.uk",
+  "facebookUrl": "https://facebook.com/amazingmagicshows",
+  "instagramUrl": "https://instagram.com/amazingmagic",
+  "categories": [
+    {
+      "categoryId": "CATEGORY_ID_HERE",
+      "isPrimary": true
+    }
+  ]
+}
+
+### Update performer profile (requires auth - performer owner or admin)
+PUT {{baseUrl}}/performers/PERFORMER_ID_HERE
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "bio": "Updated bio with new information about services and experience.",
+  "basePrice": 400.00,
+  "travelDistance": 75,
+  "websiteUrl": "https://newwebsite.co.uk",
+  "categories": [
+    {
+      "categoryId": "CATEGORY_ID_1",
+      "isPrimary": true
+    },
+    {
+      "categoryId": "CATEGORY_ID_2",
+      "isPrimary": false
+    }
+  ]
+}
+
+### ========================================
+### CATEGORY ENDPOINTS
+### ========================================
+
+### Get all categories
+GET {{baseUrl}}/categories
+
+### Get categories with pagination
+GET {{baseUrl}}/categories?page=1&limit=5
+
+### Get category by slug with featured performers
+GET {{baseUrl}}/categories/magicians
+
+### ========================================
+### ENQUIRY ENDPOINTS
+### ========================================
+
+### Create new enquiry (client only)
+POST {{baseUrl}}/enquiries
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "performerId": "PERFORMER_ID_HERE",
+  "eventType": "Wedding Reception",
+  "eventDate": "2024-08-15T19:00:00.000Z",
+  "eventTime": "7:00 PM - 11:00 PM",
+  "eventDuration": 4,
+  "eventLocation": "The Grand Hotel, Manchester",
+  "guestCount": 150,
+  "budgetMin": 400,
+  "budgetMax": 600,
+  "message": "Looking for an experienced magician for our wedding reception. We'd like close-up magic during cocktail hour and a short stage performance.",
+  "specialRequests": "Please avoid any tricks involving fire or loud noises as we have elderly guests."
+}
+
+### Get all enquiries (filtered by user role)
+GET {{baseUrl}}/enquiries
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get enquiries with filters
+GET {{baseUrl}}/enquiries?status=PENDING&page=1&limit=10
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get specific enquiry by ID
+GET {{baseUrl}}/enquiries/ENQUIRY_ID_HERE
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Update enquiry status - Accept (performer only)
+PATCH {{baseUrl}}/enquiries/ENQUIRY_ID_HERE
+Authorization: Bearer YOUR_PERFORMER_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "status": "ACCEPTED",
+  "performerResponse": "Thank you for your enquiry! I'd be delighted to perform at your wedding reception. I have extensive experience with wedding entertainment and can provide both close-up magic and a stage performance as requested.",
+  "quotedPrice": 500
+}
+
+### Update enquiry status - Decline (performer only)
+PATCH {{baseUrl}}/enquiries/ENQUIRY_ID_HERE
+Authorization: Bearer YOUR_PERFORMER_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "status": "DECLINED",
+  "performerResponse": "Thank you for your enquiry. Unfortunately, I'm not available on that date. I'd be happy to suggest alternative dates if you're flexible."
+}
+
+### ========================================
+### BOOKING ENDPOINTS
+### ========================================
+
+### Get all bookings (filtered by user role)
+GET {{baseUrl}}/bookings
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get bookings with filters
+GET {{baseUrl}}/bookings?status=CONFIRMED&page=1&limit=10
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get specific booking by ID
+GET {{baseUrl}}/bookings/BOOKING_ID_HERE
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Confirm enquiry to booking (performer only)
+POST {{baseUrl}}/bookings/ENQUIRY_ID_HERE/confirm
+Authorization: Bearer YOUR_PERFORMER_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "confirmedPrice": 500,
+  "eventTime": "7:00 PM - 11:00 PM",
+  "eventDuration": 4
+}
+
+### ========================================
+### MESSAGING ENDPOINTS
+### ========================================
+
+### Create or get thread for an enquiry
+POST {{baseUrl}}/messages/threads/ENQUIRY_ID_HERE
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+### Get all message threads for authenticated user
+GET {{baseUrl}}/messages/threads
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get threads with filters
+GET {{baseUrl}}/messages/threads?isArchived=false&page=1&limit=10
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get specific thread with all messages
+GET {{baseUrl}}/messages/threads/THREAD_ID_HERE
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Send message to thread
+POST {{baseUrl}}/messages/threads/THREAD_ID_HERE/messages
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "content": "Hi! I wanted to discuss some details about the upcoming event. Could we schedule a quick call to go over the performance requirements?",
+  "fileUrl": "https://example.com/event-details.pdf"
+}
+
+### Send message without file attachment
+POST {{baseUrl}}/messages/threads/THREAD_ID_HERE/messages
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "content": "Thank you for the information! I'll review the details and get back to you shortly."
+}
+
+### Mark message as read
+PATCH {{baseUrl}}/messages/{{messageId}}/read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+### ========================================
+### REVIEWS ENDPOINTS
+### ========================================
+
+### Create review for completed booking (client only)
+POST {{baseUrl}}/reviews/{{bookingId}}
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "ratingOverall": 5,
+  "ratingQuality": 5,
+  "ratingCommunication": 4,
+  "writtenReview": "Amazing performance! The magician was professional, entertaining, and really made our wedding special. All our guests were amazed by the tricks and the interactive show. Highly recommend!",
+  "eventType": "WEDDING",
+  "photos": [
+    "https://example.com/photo1.jpg",
+    "https://example.com/photo2.jpg"
+  ]
+}
+
+### Get reviews for a performer (public endpoint)
+GET {{baseUrl}}/reviews/{{performerId}}
+
+### Get reviews with filters
+GET {{baseUrl}}/reviews/{{performerId}}?eventType=WEDDING&minRating=4&isVerified=true&page=1&limit=5
+
+### ========================================
+### TESTIMONIALS ENDPOINTS
+### ========================================
+
+### Create testimonial (admin only)
+POST {{baseUrl}}/testimonials
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "performerId": "{{performerId}}",
+  "authorName": "Sarah Johnson",
+  "quote": "Absolutely incredible performance at our corporate event! The comedian had everyone in stitches and really brought the team together. Professional, punctual, and perfectly tailored to our audience.",
+  "eventType": "CORPORATE",
+  "isFeatured": true
+}
+
+### Get testimonials for a performer (public endpoint)
+GET {{baseUrl}}/testimonials/{{performerId}}
+
+### Get testimonials with filters
+GET {{baseUrl}}/testimonials/{{performerId}}?eventType=CORPORATE&isFeatured=true&page=1&limit=10
+
+### Toggle Featured Status (Admin Only)
+PATCH http://localhost:3001/api/testimonials/{{testimonial_id}}/featured
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "is_featured": true
+}
+
+###############################################################################
+# STRIPE CONNECT ONBOARDING
+###############################################################################
+
+### Create Stripe Connect Onboarding Link (Performer Only)
+GET http://localhost:3001/api/payments/onboard
+Authorization: Bearer {{performer_token}}
+
+### Get Stripe Connect Account Status (Performer Only)
+GET http://localhost:3001/api/payments/account-status
+Authorization: Bearer {{performer_token}}
+
+### Handle Onboarding Return (Performer Only)
+GET http://localhost:3001/api/payments/onboard-return
+Authorization: Bearer {{performer_token}}
+
+###############################################################################
+# STRIPE PAYMENT INTENTS (BOOKING CONFIRMATION)
+###############################################################################
+
+### Confirm Booking with PaymentIntent Creation (Performer Only)
+# This will create a Stripe PaymentIntent for the 25% deposit
+# Returns client_secret for frontend payment completion
+POST http://localhost:3001/api/bookings/{{enquiry_id}}/confirm
+Authorization: Bearer {{performer_token}}
+Content-Type: application/json
+
+{
+  "confirmedPrice": 500.00,
+  "eventTime": "19:00",
+  "eventDuration": 3
+}
+
+### Expected Response:
+# {
+#   "success": true,
+#   "message": "Booking confirmed successfully",
+#   "data": {
+#     "booking": { ... },
+#     "payment": {
+#       "client_secret": "pi_xxx_secret_xxx",
+#       "payment_intent_id": "pi_xxx",
+#       "amount": 12500,
+#       "currency": "gbp",
+#       "description": "Deposit for WEDDING booking - ...",
+#       "requires_payment": true
+#     }
+#   },
+#   "livemode": false,
+#   "pending_webhooks": 1,
+#   "request": {
+#     "id": "req_test_1234567890",
+#     "idempotency_key": null
+#   },
+#   "type": "payment_intent.succeeded"
+# }
+
+### Manual Webhook Testing (for development)
+# Note: This won't work without proper Stripe signature
+# Use Stripe CLI instead for proper testing
+POST http://localhost:3001/api/webhooks/stripe
+Content-Type: application/json
+
+{
+  "id": "evt_test_webhook",
+  "object": "event",
+  "type": "payment_intent.succeeded",
+  "data": {
+    "object": {
+      "id": "pi_test_1234567890",
+      "object": "payment_intent",
+      "status": "succeeded"
+    }
+  }
+}
+
+### Webhook Event Types Handled:
+# - payment_intent.succeeded: Payment completed successfully
+# - payment_intent.payment_failed: Payment failed
+# - payment_intent.canceled: Payment canceled by client
+# - charge.dispute.created: Dispute/chargeback created (prep for Step 5)
+
+### Testing Workflow:
+# 1. Create booking with PaymentIntent (see booking confirmation above)
+# 2. Use Stripe CLI to trigger payment_intent.succeeded event
+# 3. Check booking status updated to deposit_paid=true
+# 4. Check transaction status updated to SUCCEEDED
+# 5. Check console logs for webhook processing confirmation
+
+###############################################################################
+# STRIPE PAYOUTS
+###############################################################################
+
+### Get Payout History (Performer View)
+# Performers can view their own payout history
+GET http://localhost:3001/api/payments/payouts
+Authorization: Bearer {{performer_token}}
+
+# Expected Response:
+# {
+#   "success": true,
+#   "data": {
+#     "payouts": [
+#       {
+#         "id": "booking-123",
+#         "confirmed_price": 500.00,
+#         "deposit_amount": 125.00,
+#         "payout_status": "paid",
+#         "payout_at": "2024-01-15T10:30:00Z",
+#         "stripe_transfer_id": "tr_1234567890",
+#         "platform_fee": 12.50,
+#         "payout_amount": 112.50,
+#         "performer": {
+#           "business_name": "Amazing Entertainment",
+#           "user": {
+#             "first_name": "John",
+#             "last_name": "Performer",
+#             "email": "john@performer.com"
+#           }
+#         },
+#         "client": {
+#           "first_name": "Jane",
+#           "last_name": "Client"
+#         },
+#         "enquiry": {
+#           "event_type": "WEDDING",
+#           "event_date": "2024-02-14T18:00:00Z"
+#         }
+#       }
+#     ],
+#     "total_count": 1
+#   }
+# }
+
+### Get Payout History (Admin View)
+# Admins can view all payout records across all performers
+GET http://localhost:3001/api/payments/payouts
+Authorization: Bearer {{admin_token}}
+
+# Expected Response: Same format as above but includes all performers
+
+### Trigger Manual Payout (Admin Only)
+# Force payout for a specific booking (emergency/manual override)
+POST http://localhost:3001/api/payments/manual-payout/{{booking_id}}
+Authorization: Bearer {{admin_token}}
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Manual payout processed successfully",
+#   "data": {
+#     "booking_id": "booking-123",
+#     "performer": {
+#       "name": "John Performer",
+#       "email": "john@performer.com"
+#     },
+#     "payout_amount": 112.50
+#   }
+# }
+
+### Run Payout Processing Script
+# Background job to process all pending payouts
+# Run via command line: npm run process-payouts
+# Or via cron job every 15-30 minutes
+
+# Console output example:
+# 🔄 Starting payout processing...
+# 📋 Found 3 bookings eligible for payout
+# 💰 Processing payout for John Performer:
+#    Deposit: £125.00
+#    Platform Fee (10%): £12.50
+#    Payout Amount: £112.50
+# ✅ Stripe transfer created: tr_1234567890
+# ✅ Payout processed for booking booking-123
+# 🎯 Payout processing complete: 3 successful, 0 failed
+
+### Payout Eligibility Requirements:
+# - Booking must have deposit_paid = true
+# - Booking must have payout_status = 'pending'
+# - Performer must have completed Stripe Connect onboarding
+# - Performer's Stripe account must be active (charges_enabled = true)
+# - Performer's Stripe account must support payouts (payouts_enabled = true)
+# - Payment must be confirmed at least 5 minutes ago (prevents race conditions)
+
+### Payout Calculation:
+# - Deposit Amount: 25% of confirmed booking price
+# - Platform Fee: 10% of deposit amount
+# - Payout Amount: Deposit - Platform Fee
+# - Example: £500 booking → £125 deposit → £12.50 fee → £112.50 payout
+
+### Payout Flow:
+# 1. Payment confirmed via webhook → booking.deposit_paid = true
+# 2. Background job runs every 15-30 minutes
+# 3. Script finds eligible bookings (deposit paid, payout pending)
+# 4. Validates performer Stripe account status
+# 5. Creates Stripe transfer to performer's Connect account
+# 6. Updates booking.payout_status = 'paid' and payout_at timestamp
+# 7. Creates payout transaction record for audit trail
+# 8. Logs success/failure for monitoring
+
+### Error Handling:
+# - Invalid Stripe account → payout_status = 'failed'
+# - Insufficient funds → retry on next run
+# - API errors → logged and marked as failed
+# - Manual intervention available via admin endpoint
+
+### ========================================
+### ERROR EXAMPLES - PERFORMERS
+### ========================================
+
+# ===========================================
+# BOOKING CANCELLATION ENDPOINTS
+# ===========================================
+
+### Cancel booking (client only) - Success case
+POST {{baseUrl}}/bookings/YOUR_BOOKING_ID_HERE/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Change of plans - need to reschedule for a different date"
+}
+
+### Cancel booking - Deposit only (no refund)
+POST {{baseUrl}}/bookings/DEPOSIT_ONLY_BOOKING_ID/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Event cancelled due to venue issues"
+}
+
+### Cancel booking - Full payment made (partial refund)
+POST {{baseUrl}}/bookings/FULL_PAYMENT_BOOKING_ID/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Personal emergency - cannot proceed with event"
+}
+
+### Cancel booking - Within 21 days (should fail)
+POST {{baseUrl}}/bookings/RECENT_BOOKING_ID/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Last minute cancellation"
+}
+
+### Cancel booking - Already cancelled (should fail)
+POST {{baseUrl}}/bookings/CANCELLED_BOOKING_ID/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Trying to cancel again"
+}
+
+### Cancel booking - Performer trying to cancel (should fail)
+POST {{baseUrl}}/bookings/YOUR_BOOKING_ID_HERE/cancel
+Authorization: Bearer YOUR_PERFORMER_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Performer cannot cancel bookings"
+}
+
+### Cancel booking - Invalid reason (should fail)
+POST {{baseUrl}}/bookings/YOUR_BOOKING_ID_HERE/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": ""
+}
+
+### Cancel booking - Non-existent booking
+POST {{baseUrl}}/bookings/non-existent-id/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Cannot find this booking"
+}
+
+### Cancel booking - Unauthorized (different client)
+POST {{baseUrl}}/bookings/SOMEONE_ELSES_BOOKING_ID/cancel
+Authorization: Bearer YOUR_CLIENT_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "reason": "Trying to cancel someone else's booking"
+}
+
+### Cancel booking - No authentication
+POST {{baseUrl}}/bookings/YOUR_BOOKING_ID_HERE/cancel
+Content-Type: {{contentType}}
+
+{
+  "reason": "No auth token provided"
+}
+
+# Expected Response Examples:
+# Success (deposit only):
+# {
+#   "message": "Booking cancelled successfully",
+#   "booking": {
+#     "id": "booking_id",
+#     "status": "CANCELLED",
+#     "cancelled_at": "2024-01-15T10:30:00Z",
+#     "cancelled_by": "CLIENT",
+#     "refund_status": "NONE",
+#     "refund_reason": "No refund - deposit only",
+#     "cancellation_reason": "Change of plans"
+#   },
+#   "refund_summary": {
+#     "total_amount": 500,
+#     "deposit_amount": 125,
+#     "refund_amount": 0,
+#     "deposit_retained": 125,
+#     "refund_transaction_id": null,
+#     "refund_status": "NONE",
+#     "message": "No refund processed. Deposit of £125 is non-refundable."
+#   }
+# }
+#
+# Success (with refund):
+# {
+#   "message": "Booking cancelled successfully",
+#   "booking": {
+#     "id": "booking_id",
+#     "status": "CANCELLED",
+#     "cancelled_at": "2024-01-15T10:30:00Z",
+#     "cancelled_by": "CLIENT",
+#     "refund_status": "REFUNDED",
+#     "refund_reason": "Refund of £375 processed (deposit non-refundable)",
+#     "cancellation_reason": "Personal emergency"
+#   },
+#   "refund_summary": {
+#     "total_amount": 500,
+#     "deposit_amount": 125,
+#     "refund_amount": 375,
+#     "deposit_retained": 125,
+#     "refund_transaction_id": "txn_refund_id",
+#     "refund_status": "REFUNDED",
+#     "message": "Refund of £375 processed. Deposit of £125 is non-refundable."
+#   }
+# }
+#
+# Error (within 21 days):
+# {
+#   "error": "Cannot cancel booking within 21 days of the event date",
+#   "status": 400
+# }
+#
+# Error (already cancelled):
+# {
+#   "error": "Booking is already cancelled",
+#   "status": 400
+# }
+#
+# Error (performer trying to cancel):
+# {
+#   "error": "Only clients can cancel bookings",
+#   "status": 403
+# }
+
+### ========================================
+
+### Create performer without auth
+POST {{baseUrl}}/performers
+Content-Type: {{contentType}}
+
+{
+  "businessName": "Test Performer",
+  "location": "London",
+  "basePrice": 100,
+  "categories": []
+}
+
+### Create performer with invalid data
+POST {{baseUrl}}/performers
+Authorization: Bearer YOUR_PERFORMER_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "businessName": "",
+  "location": "",
+  "basePrice": -100,
+  "categories": []
+}
+
+### Get non-existent performer
+GET {{baseUrl}}/performers/non-existent-id
+
+### Update performer without permission
+PUT {{baseUrl}}/performers/SOMEONE_ELSES_PERFORMER_ID
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: {{contentType}}
+
+{
+  "bio": "Trying to update someone else's profile"
+}
