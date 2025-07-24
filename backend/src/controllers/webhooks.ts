@@ -63,7 +63,7 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
     }
 
     // Always respond with 200 to acknowledge receipt
-    res.status(200).json({ received: true, event_type: event.type });
+    return res.status(200).json({ received: true, event_type: event.type });
 
   } catch (error) {
     console.error(`❌ Error processing webhook event ${event.type}:`, error);

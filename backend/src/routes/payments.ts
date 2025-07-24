@@ -39,13 +39,13 @@ router.get('/onboard-return', jwtAuth, handleOnboardingReturn as any);
  * @desc    Get payout history (performer sees own, admin sees all)
  * @access  Private (Performer/Admin)
  */
-router.get('/payouts', jwtAuth, getPayouts);
+router.get('/payouts', jwtAuth, getPayouts as any);
 
 /**
  * @route   POST /api/payments/manual-payout/:bookingId
  * @desc    Trigger manual payout for specific booking
  * @access  Private (Admin only)
  */
-router.post('/manual-payout/:bookingId', jwtAuth, triggerManualPayout);
+router.post('/manual-payout/:bookingId', jwtAuth, triggerManualPayout as any);
 
 export default router;

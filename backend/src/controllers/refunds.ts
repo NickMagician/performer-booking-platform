@@ -121,7 +121,7 @@ export const getRefunds = async (req: Request, res: Response): Promise<Response 
       refund_processed_at: booking.transactions.length > 0 ? booking.transactions[0].updated_at : null
     }));
 
-    res.json({
+    return res.json({
       refunds: formattedRefunds,
       pagination: {
         page,
@@ -258,7 +258,7 @@ export const processManualRefund = async (req: Request, res: Response): Promise<
       console.log(`✅ Manual refund processed: ${refund.id} for £${refundAmount}`);
       console.log(`📧 Mock notification: Manual refund of £${refundAmount} processed for booking ${booking.id}`);
 
-      res.json({
+      return res.json({
         message: 'Manual refund processed successfully',
         refund: {
           booking_id: booking.id,

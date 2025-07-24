@@ -18,9 +18,7 @@ export interface JwtTokens {
 export const generateAccessToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, config.jwtSecret, {
     expiresIn: config.jwtExpiresIn,
-    issuer: 'booking-platform',
-    audience: 'booking-platform-users',
-  } as jwt.SignOptions);
+  });
 };
 
 /**

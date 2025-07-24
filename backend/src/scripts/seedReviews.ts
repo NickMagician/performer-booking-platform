@@ -53,7 +53,7 @@ export async function seedReviewsAndTestimonials() {
     }
   ];
 
-  const createdClients = [];
+  const createdClients: any[] = [];
   for (const clientData of additionalClients) {
     const client = await prisma.user.upsert({
       where: { email: clientData.email },
@@ -65,7 +65,7 @@ export async function seedReviewsAndTestimonials() {
         status: 'ACTIVE',
       }
     });
-    createdClients.push(client as any);
+    createdClients.push(client);
   }
 
   const allClients = [...clients, ...createdClients];

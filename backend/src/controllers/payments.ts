@@ -191,7 +191,7 @@ export const handleOnboardingReturn = async (req: AuthenticatedRequest, res: Res
 
     console.log(`Onboarding return for performer ${performer.id}: complete=${onboardingComplete}`);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         onboarding_complete: onboardingComplete,
@@ -309,7 +309,7 @@ export const getPayouts = async (req: Request, res: Response): Promise<Response 
 
     console.log(`📋 Retrieved ${payouts.length} payout records for user ${userId} (${userType})`);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         payouts: payoutsWithAmounts,
@@ -412,7 +412,7 @@ export const triggerManualPayout = async (req: Request, res: Response): Promise<
 
     console.log(`💰 Manual payout triggered by admin ${userId} for booking ${bookingId}`);
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Manual payout processed successfully',
       data: {
